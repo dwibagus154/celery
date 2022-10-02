@@ -13,7 +13,7 @@ RABBITMQ_PASSWORD="guest"
 app = Celery('download',backend='rpc://',broker='amqp://'+RABBITMQ_USERNAME+':'+RABBITMQ_PASSWORD+'@localhost')
 
 app.conf.beat_schedule = {
-    'add-every-30-seconds': {
+    'add-every-3-seconds': {
         'task': 'downloads',
         'schedule': 3.0
     },

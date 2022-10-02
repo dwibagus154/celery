@@ -1,5 +1,6 @@
 from webbrowser import get
 from celery import Celery
+from celery.exceptions import SoftTimeLimitExceeded
 import urllib.request
 import requests
 import shutil
