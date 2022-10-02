@@ -7,18 +7,22 @@ import os
 from time import sleep
 
 BASEDIR="\downloads"
-RABBITMQ_USERNAME="rabbitmq"
-RABBITMQ_PASSWORD="rabbitmqpass"
+RABBITMQ_USERNAME="guest"
+RABBITMQ_PASSWORD="guest"
 
 app = Celery('downloadImages',backend='rpc://',broker='amqp://'+RABBITMQ_USERNAME+':'+RABBITMQ_PASSWORD+'@localhost')
 
-@app.task
-def download(url,filename):
-    sleep(3)
-    res = requests.get(url, stream = True)
-    with open(filename,'wb') as f:
-        shutil.copyfileobj(res.raw, f)
-    return(True)
+@app.task(bind=True,time_limit=10, max_retries=3, default_retry_delay=5)
+def download(self, url,filename):
+    try:
+        sleep(3)
+        res = requests.get(url, stream = True)
+        with open(filename,'wb') as f:
+            shutil.copyfileobj(res.raw, f)
+        return(True)
+    except SoftTimeLimitExceeded:
+        self.retry(countdown=5)
+    
 
 
 @app.task
