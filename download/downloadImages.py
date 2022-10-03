@@ -1,6 +1,6 @@
 from webbrowser import get
 from celery import Celery
-from celery.exceptions import SoftTimeLimitExceeded
+from celery.exceptions import SoftTimeLimitExceeded, TimeLimitExceeded
 import urllib.request
 import requests
 import shutil
@@ -13,7 +13,7 @@ RABBITMQ_PASSWORD="guest"
 
 app = Celery('downloadImages',backend='rpc://',broker='amqp://'+RABBITMQ_USERNAME+':'+RABBITMQ_PASSWORD+'@localhost')
 
-@app.task(bind=True,time_limit=10, max_retries=3, default_retry_delay=5)
+@app.task(bind=True, soft_time_limit=1, max_retries=3, default_retry_delay=5)
 def download(self, url,filename):
     try:
         sleep(3)
